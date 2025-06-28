@@ -10,74 +10,85 @@ def afficher_menu():
     print("**************************")
 
 class Calculatrice:
-    def __init__(self, a=None, b=None):
-        # On initialise a et b à None. Ils seront demandés si besoin.
-        self.a = a
-        self.b = b
-        self.r = 0
+    """
+    Une classe simple pour effectuer des opérations arithmétiques de base.
+    """
+    def __init__(self):
+        """
+        Initialise une nouvelle instance de Calculatrice.
+        Les nombres sur lesquels opérer ne sont pas stockés en permanence
+        dans l'objet, mais demandés au besoin pour chaque opération.
+        Le résultat de la dernière opération est stocké dans 'resultat'.
+        """
+        self.resultat = 0
 
-    def demander_nombres(self):
-        """Demande les deux nombres à l'utilisateur."""
-        try:
-            self.a = int(input("Entrez le premier nombre: \n"))
-            self.b = int(input("Entrez le deuxième nombre: \n"))
-        except ValueError:
-            print("Erreur: Veuillez entrer des nombres entiers valides.")
-            # On réinitialise les nombres pour éviter des erreurs futures
-            self.a = None
-            self.b = None
-
-    def afficher(self):
-        print("Résultat :", self.r)
+    def _obtenir_nombres(self):
+        """
+        Méthode interne (privée) pour obtenir deux nombres entiers de l'utilisateur.
+        Utilise un underscore préfixe pour indiquer qu'elle est destinée à un usage interne.
+        """
+        while True:
+            try:
+                num1 = float(input("Entrez le premier nombre: "))
+                num2 = float(input("Entrez le deuxième nombre: "))
+                return num1, num2
+            except ValueError:
+                print("Erreur: Veuillez entrer des nombres valides (entiers ou décimaux).")
 
     def addition(self):
-        self.r = self.a + self.b
-        self.afficher()
+        """Effectue une addition et affiche le résultat."""
+        num1, num2 = self._obtenir_nombres()
+        self.resultat = num1 + num2
+        self._afficher_resultat("Addition")
 
     def soustraction(self):
-        self.r = self.a - self.b
-        self.afficher()
+        """Effectue une soustraction et affiche le résultat."""
+        num1, num2 = self._obtenir_nombres()
+        self.resultat = num1 - num2
+        self._afficher_resultat("Soustraction")
 
     def multiplication(self):
-        self.r = self.a * self.b
-        self.afficher()
+        """Effectue une multiplication et affiche le résultat."""
+        num1, num2 = self._obtenir_nombres()
+        self.resultat = num1 * num2
+        self._afficher_resultat("Multiplication")
 
     def division(self):
-        if self.b != 0:
-            self.r = self.a / self.b
-            self.afficher()
+        """Effectue une division et affiche le résultat, gérant la division par zéro."""
+        num1, num2 = self._obtenir_nombres()
+        if num2 != 0:
+            self.resultat = num1 / num2
+            self._afficher_resultat("Division")
         else:
-            print("Erreur : Division par zéro impossible !")
+            print("Erreur: Division par zéro impossible !")
+
+    def _afficher_resultat(self, operation):
+        """
+        Méthode interne pour afficher le résultat de l'opération.
+        """
+        print(f"Résultat de l'{operation}: {self.resultat}")
 
 # --- Démarrage du programme principal ---
 
-# Création d'une seule instance de la calculatrice.
-# Les nombres seront demandés à chaque opération.
-ma_calc = Calculatrice()
+if __name__ == "__main__": # Cette ligne assure que le code s'exécute seulement si le script est lancé directement
+    ma_calc = Calculatrice() # Création d'une seule instance de la calculatrice.
 
-# Boucle principale de la calculatrice
-while True:
-    afficher_menu()
-    choix = input("Choisissez une opération (1-5): ")
+    # Dictionnaire pour mapper les choix aux méthodes de la calculatrice
+    operations = {
+        '1': ma_calc.addition,
+        '2': ma_calc.soustraction,
+        '3': ma_calc.multiplication,
+        '4': ma_calc.division
+    }
 
-    if choix == '5':
-        print("Merci d'avoir utilisé la calculatrice. Au revoir!")
-        break # Sort de la boucle et termine le programme
+    while True:
+        afficher_menu()
+        choix = input("Choisissez une opération (1-5): ")
 
-    # Demande les nombres avant chaque opération
-    ma_calc.demander_nombres()
-
-    # Vérifie si les nombres ont été saisis correctement avant de procéder
-    if ma_calc.a is None or ma_calc.b is None:
-        continue # Passe à l'itération suivante de la boucle si une erreur est survenue
-
-    if choix == '1':
-        ma_calc.addition()
-    elif choix == '2':
-        ma_calc.soustraction()
-    elif choix == '3':
-        ma_calc.multiplication()
-    elif choix == '4':
-        ma_calc.division()
-    else:
-        print("Choix invalide. Veuillez choisir une option entre 1 et 5.")
+        if choix == '5':
+            print("Merci d'avoir utilisé la calculatrice. Au revoir!")
+            break
+        elif choix in operations:
+            operations[choix]() # Appelle la méthode correspondante
+        else:
+            print("Choix invalide. Veuillez choisir une option entre 1 et 5.")
